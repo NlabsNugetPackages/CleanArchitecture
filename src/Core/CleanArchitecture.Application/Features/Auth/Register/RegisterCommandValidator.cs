@@ -7,18 +7,15 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
     public RegisterCommandValidator(UserManager<AppUser> userManager)
     {
-        RuleFor(p => p.FirstName).MinimumLength(3);
+        RuleFor(p => p.FirstName).NotEmpty().NotNull().WithMessage("FirstName not null");
+        RuleFor(p => p.FirstName).MinimumLength(3).WithMessage("FirstName must be at least 3 characters.");
+        RuleFor(p => p.FirstName).NotEmpty().NotNull().WithMessage("LastName not null");
+        RuleFor(p => p.FirstName).MinimumLength(3).WithMessage("LastName must be at least 3 characters.");
         RuleFor(p => p.LastName).MinimumLength(3);
-        RuleFor(p => p.Email)
-            .EmailAddress()
-            .MinimumLength(3);
-        //.MustAsync(async (email, cancellationToken) =>
-        //    !await userManager.Users.AnyAsync(p => p.Email == email, cancellationToken))
-        //.WithMessage("Email address already exists");
-        RuleFor(p => p.UserName)
-            .MinimumLength(3);
-        //.MustAsync(async (userName, cancellationToken)=> 
-        //  !await userManager.Users.AnyAsync(p=> p.UserName == userName, cancellationToken))
-        //.WithMessage("User name already exists");
+
+        RuleFor(p => p.Email).NotEmpty().NotNull().WithMessage("Email not null");
+        RuleFor(p => p.Email).EmailAddress().MinimumLength(3).WithMessage("Email must be at least 3 characters.");
+        RuleFor(p => p.UserName).NotEmpty().NotNull().WithMessage("UserName not null");
+        RuleFor(p => p.UserName).MinimumLength(3).WithMessage("UserName must be at least 3 characters.");
     }
 }

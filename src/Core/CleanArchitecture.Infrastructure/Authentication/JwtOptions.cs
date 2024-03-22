@@ -1,5 +1,5 @@
-﻿namespace CleanArchitecture.Application.Options;
-public sealed class Jwt
+﻿namespace CleanArchitecture.Infrastructure.Authentication;
+public sealed class JwtOptions
 {
     public string Issuer { get; set; } = string.Empty;
     public string Audience { get; set; } = string.Empty;
