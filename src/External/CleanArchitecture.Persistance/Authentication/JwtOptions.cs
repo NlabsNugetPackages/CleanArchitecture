@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Infrastructure.Authentication;
+﻿namespace CleanArchitecture.Persistance.Authentication;
 public sealed class JwtOptions
 {
     public string Issuer { get; set; } = string.Empty;

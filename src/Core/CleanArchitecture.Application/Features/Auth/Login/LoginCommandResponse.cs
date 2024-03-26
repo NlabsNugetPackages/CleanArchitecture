@@ -3,5 +3,6 @@ public sealed record LoginCommandResponse(
     string AccessToken,
     string RefreshToken,
     DateTime RehfreshTokenExpires,
-    string UserId
+    string UserId,
+    int StatusCode
 );

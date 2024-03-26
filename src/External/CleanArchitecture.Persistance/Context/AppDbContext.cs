@@ -13,14 +13,17 @@ internal sealed class AppDbContext : IdentityDbContext<AppUser, AppRole, string>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Ignore<IdentityUserLogin<Guid>>();
-        builder.Ignore<IdentityRoleClaim<Guid>>();
-        //builder.Ignore<IdentityUserClaim<Guid>>();
-        builder.Ignore<IdentityUserToken<Guid>>();
-        //builder.Ignore<IdentityUserRole<Guid>>();
 
-        builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
-        builder.Entity<IdentityUserRole<Guid>>()
+        //builder.ApplyConfigurationsFromAssembly(typeof(AppUser).Assembly);
+
+        builder.Ignore<IdentityUserLogin<string>>();
+        builder.Ignore<IdentityRoleClaim<string>>();
+        //builder.Ignore<IdentityUserClaim<string>>();
+        builder.Ignore<IdentityUserToken<string>>();
+        //builder.Ignore<IdentityUserRole<string>>();
+
+        builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+        builder.Entity<IdentityUserRole<string>>()
             .ToTable("UserRoles")
             .HasKey(x => new { x.UserId, x.RoleId });
     }

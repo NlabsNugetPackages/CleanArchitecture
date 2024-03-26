@@ -18,7 +18,6 @@ public interface IRepository<T>
     Task AddAsync(T entity, CancellationToken cancellationToken = default);
     void Add(T entity);
     Task AddRangeAsync(ICollection<T> entities, CancellationToken cancellationToken = default);
-    void AddRange(ICollection<T> entities);
     void Update(T entity);
     void UpdateRange(ICollection<T> entities);
     Task DeleteByIdAsync(string id);
