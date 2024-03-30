@@ -11,11 +11,12 @@ public sealed class SendConfirmEmailDomainEvent : INotificationHandler<AuthDomai
     {
         using (MailMessage mail = new MailMessage())
         {
+            var subject = "Registration Activation Email";
             var emailOptions = new EmailOptions();
             mail.From = new MailAddress(emailOptions.Email);
             mail.To.Add(notification._user.Email ?? "");
-            mail.Subject = notification.Subject;
-            mail.Body = CreateConfirmEmailBody(notification.EmailConfirmCode);
+            mail.Subject = subject;
+            mail.Body = CreateConfirmEmailBody(notification._user.EmailConfirmCode.ToString());
             mail.IsBodyHtml = true;
 
 

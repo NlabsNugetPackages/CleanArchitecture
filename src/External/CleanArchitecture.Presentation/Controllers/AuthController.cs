@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.Features.Auth.Login;
+﻿using CleanArchitecture.Application.Features.Auth.ConfirmEmail;
+using CleanArchitecture.Application.Features.Auth.Login;
 using CleanArchitecture.Application.Features.Auth.Register;
 using CleanArchitecture.Presentation.Abstraction;
 using MediatR;
@@ -21,7 +22,18 @@ public sealed class AuthController : ApiController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterCommand request, CancellationToken cancellationToken = default)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        return StatusCode(response.StatusCode, response);
+    }
+
+
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailCommand request, CancellationToken cancellationToken = default)
     {
         var response = await _mediator.Send(request, cancellationToken);
         return StatusCode(response.StatusCode, response);
