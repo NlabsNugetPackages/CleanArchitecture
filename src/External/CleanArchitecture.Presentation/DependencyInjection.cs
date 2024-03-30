@@ -1,11 +1,9 @@
 ﻿using CleanArchitecture.Application;
-using CleanArchitecture.Application.Services;
+using CleanArchitecture.Application.Options;
 using CleanArchitecture.Persistance;
-using CleanArchitecture.Persistance.Authentication;
 using CleanArchitecture.Presentation.Middleware;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace CleanArchitecture.Presentation;
 public static class DependencyInjection
@@ -31,6 +29,7 @@ public static class DependencyInjection
 
         services.AddPersistance(configuration);
 
+        services.AddSingleton<EmailOptions>();
 
         services.AddTransient<ExceptionMiddleware>();
 

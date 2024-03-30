@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.Services;
+﻿using CleanArchitecture.Application.Events;
+using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Utilities;
 using CleanArchitecture.Domain.Entities;
 using MediatR;
@@ -47,7 +48,10 @@ public sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMe
 
         var subject = "Kayıt Aktivasyon Emaili";
 
-        await mediator.Publish(EmailService.SendEmailAsync(user.Email,subject,user.EmailConfirmCode.ToString(), cancellationToken));
+        //event üzerinden email gönderimi başarılı oldugu için buna gerek kalmadı bir alttaki event üzerinden gönderim saglanıyor artık
+        //await mediator.Publish(EmailService.SendEmailAsync(user.Email, subject, user.EmailConfirmCode.ToString(), cancellationToken));
+
+        await mediator.Publish(new AuthDomainEvent(user, subject, "", emailConfirmCode.ToString()));
 
         return Result<string>.Succeed("User created successfully");
     }

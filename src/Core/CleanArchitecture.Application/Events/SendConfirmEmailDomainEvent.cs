@@ -1,22 +1,21 @@
 ﻿using CleanArchitecture.Application.Options;
-using CleanArchitecture.Application.Utilities;
+using MediatR;
 using System.Net;
 using System.Net.Mail;
 
-namespace CleanArchitecture.Application.Services;
-public static class EmailService
+namespace CleanArchitecture.Application.Events;
+
+public sealed class SendConfirmEmailDomainEvent : INotificationHandler<AuthDomainEvent>
 {
-    //event üzerinden gönderme gerçekleştigi için artık buna gerek kalmadı.
-    public static async Task<Result<string>> SendEmailAsync(string toEmail, string subject, string toEmailConfirmCode, CancellationToken cancellationToken)
+    public async Task Handle(AuthDomainEvent notification, CancellationToken cancellationToken)
     {
         using (MailMessage mail = new MailMessage())
         {
             var emailOptions = new EmailOptions();
-
             mail.From = new MailAddress(emailOptions.Email);
-            mail.To.Add(toEmail);
-            mail.Subject = subject;
-            mail.Body = EmailBody(toEmailConfirmCode);
+            mail.To.Add(notification._user.Email ?? "");
+            mail.Subject = notification.Subject;
+            mail.Body = CreateConfirmEmailBody(notification.EmailConfirmCode);
             mail.IsBodyHtml = true;
 
 
@@ -29,11 +28,9 @@ public static class EmailService
                 await smtp.SendMailAsync(mail);
             }
         }
-
-        return Result<string>.Succeed("Email başarıyla gönderildi");
     }
 
-    public static string EmailBody(string emailConfirmCode)
+    private string CreateConfirmEmailBody(string emailConfirmCode)
     {
         string body = @"
                         <!DOCTYPE html>
