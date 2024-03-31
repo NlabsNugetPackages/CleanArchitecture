@@ -20,6 +20,6 @@ internal sealed class ForgotPasswordEmailCommandHandler(UserManager<AppUser> use
         }
 
 
-        return Result<string>.Succeed("User created successfully");
+        return Result<string>.Succeed("Your user password has been updated. Verification code has been sent via email.");
     }
 }
