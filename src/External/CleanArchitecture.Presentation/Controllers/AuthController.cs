@@ -52,4 +52,12 @@ public sealed class AuthController : ApiController
         var response = await _mediator.Send(request, cancellationToken);
         return StatusCode(response.StatusCode, response);
     }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> SendResetPassword(ForgotPasswordEmailCommand request, CancellationToken cancellationToken = default)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        return StatusCode(response.StatusCode, response);
+    }
 }

@@ -21,7 +21,7 @@ internal sealed class ForgotPasswordEmailCommandHandler(UserManager<AppUser> use
 
         Random? random = new();
 
-        int emailConfirmCode = random.Next(111111, 999999);
+        var emailConfirmCode = random.Next(111111, 999999);
         var isEmailConfirmCodeExists = true;
 
         while (isEmailConfirmCodeExists)
