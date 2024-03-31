@@ -37,6 +37,7 @@ public sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMe
             Email = request.Email.ToLower().Trim(),
             UserName = request.UserName.ReplaceAllTurkishCharacters().ToLower().Trim(),
             EmailConfirmCode = emailConfirmCode,
+            EmailConfirmCodeSendDate = DateTime.Now
         };
 
         var result = await userManager.CreateAsync(user, request.Password);

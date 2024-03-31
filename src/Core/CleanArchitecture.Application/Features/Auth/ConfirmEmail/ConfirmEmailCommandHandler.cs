@@ -16,6 +16,11 @@ internal sealed class ConfirmEmailCommandHandler(UserManager<AppUser> userManage
             return Result<string>.Failure(500, "Email confirm code is not available");
         }
 
+        if (user.EmailConfirmed is true)
+        {
+            return Result<string>.Failure(500, "This account has already been verified!");
+        }
+
         if (user.EmailConfirmCodeSendDate.AddMinutes(10) < DateTime.Now)
         {
             return Result<string>.Failure(500, "Email verification code is invalid and has expired");

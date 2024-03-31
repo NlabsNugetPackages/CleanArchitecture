@@ -45,8 +45,7 @@ public class JwtProvider(UserManager<AppUser> userManager, IOptions<JwtOptions> 
             token,
             refreshToken,
             user.RefreshTokenExpires.Value,
-            user.Id,
-            200);
+            user.Id);
 
         return response;
     }

@@ -1,33 +1,46 @@
 ﻿using AutoMapper;
 using CleanArchitecture.Application.Services;
+using CleanArchitecture.Application.Utilities;
 using CleanArchitecture.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace CleanArchitecture.Application.Features.Auth.Login;
 
-internal sealed class LoginCommandHandler(UserManager<AppUser> userManager, IJwtProvider jwtProvider, IMapper mapper) : IRequestHandler<LoginCommand, LoginCommandResponse>
+internal sealed class LoginCommandHandler(UserManager<AppUser> userManager, IJwtProvider jwtProvider, IMapper mapper) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
-    public async Task<LoginCommandResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await userManager.Users.Where(p => p.UserName == request.UserNameOrEmail || p.Email == request.UserNameOrEmail).FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
         {
-            throw new ArgumentException("Kullanıcı bulunamadı!");
+            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.NotFound, "User not found!");
         }
 
-        bool checkPassword = await userManager.CheckPasswordAsync(user, request.Password);
+        if (user.EmailConfirmed is false)
+        {
+            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.NotFound, "This registration has not been approved, please confirm your registration!");
+        }
+
+        var checkPassword = await userManager.CheckPasswordAsync(user, request.Password);
         if (!checkPassword)
         {
-            throw new ArgumentException("Şifre yanlış!");
+            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.Unauthorized, "Wrong password!");
         }
 
         var token = await jwtProvider.CreateTokenAsync(user, request.RememberMe);
 
+        var response = new LoginCommandResponse(
+                                AccessToken: token.AccessToken,
+                                RefreshToken: user.RefreshToken!,
+                                RehfreshTokenExpires: user.RefreshTokenExpires!.Value,
+                                UserId: user.Id
+                            );
 
-        return new(StatusCode: 200, AccessToken: token.AccessToken, RefreshToken: user.RefreshToken, RehfreshTokenExpires: user.RefreshTokenExpires.Value, UserId: user.Id);
+        return Result<LoginCommandResponse>.Succeed(response);
     }
 }
 
