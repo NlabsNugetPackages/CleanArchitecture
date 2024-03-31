@@ -22,8 +22,7 @@ public sealed class SendConfirmEmailDomainEvent : INotificationHandler<AuthDomai
         
         using (MailMessage mail = new MailMessage())
         {
-            var subject = "Registration Activation Email";
-            //var emailOptions = new EmailOptions();
+            var subject = "User Account Verification Process";
             mail.From = new MailAddress(emailOptions!.Email);
             mail.To.Add(notification._user.Email ?? "");
             mail.Subject = subject;

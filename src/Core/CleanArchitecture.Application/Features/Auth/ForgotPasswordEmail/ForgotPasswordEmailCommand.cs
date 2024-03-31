@@ -1,25 +1,16 @@
 ﻿using CleanArchitecture.Application.Utilities;
-using CleanArchitecture.Domain.Entities;
+using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace CleanArchitecture.Application.Features.Auth.ForgotPasswordEmail;
 public sealed record ForgotPasswordEmailCommand(string UserNameOrEmail) : IRequest<Result<string>>;
 
-internal sealed class ForgotPasswordEmailCommandHandler(UserManager<AppUser> userManager) : IRequestHandler<ForgotPasswordEmailCommand, Result<string>>
+
+public class ForgotPasswordEmailCommandValidator : AbstractValidator<ForgotPasswordEmailCommand>
 {
-    public async Task<Result<string>> Handle(ForgotPasswordEmailCommand request, CancellationToken cancellationToken)
+    public ForgotPasswordEmailCommandValidator()
     {
-        var user = await userManager.Users.Where(p => p.UserName == request.UserNameOrEmail || p.Email == request.UserNameOrEmail).FirstOrDefaultAsync(cancellationToken);
-
-        if (user is null)
-        {
-            return Result<string>.Failure((int)HttpStatusCode.NotFound, "User not found!");
-        }
-
-
-        return Result<string>.Succeed("Your user password has been updated. Verification code has been sent via email.");
+            RuleFor(u => u.UserNameOrEmail).NotEmpty().NotNull().WithMessage("UserName Or Email cannot be empty!");
+        RuleFor(u => u.UserNameOrEmail).MinimumLength(6).WithMessage("UserName Or Email must be at least 6 characters!");
     }
 }
