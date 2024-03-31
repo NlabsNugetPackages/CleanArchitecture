@@ -7,4 +7,6 @@ public sealed class EmailOptions
     public int PORT { get; set; } = 587;
     public bool SSL { get; set; } = true;
     public bool HTML { get; set; } = true;
+
+
 }

@@ -29,8 +29,6 @@ public sealed class AuthController : ApiController
         return StatusCode(response.StatusCode, response);
     }
 
-
-
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmail(ConfirmEmailCommand request, CancellationToken cancellationToken = default)
