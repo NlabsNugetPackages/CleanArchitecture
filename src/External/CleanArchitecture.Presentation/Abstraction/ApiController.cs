@@ -8,8 +8,5 @@ public class ApiController : ControllerBase
 {
     public readonly IMediator _mediator;
 
-    public ApiController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    public ApiController(IMediator mediator) { _mediator = mediator; }
 }

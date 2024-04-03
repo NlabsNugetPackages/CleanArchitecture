@@ -2,12 +2,12 @@
 
 namespace CleanArchitecture.Application.Features.Auth.SendResetPasword;
 
-public class SendResetPasswordCommandValidator : AbstractValidator<SendResetPasswordCommand>
+public class ChangePasswordWithForgotPasswordCodeCommandValidator : AbstractValidator<ChangePasswordWithForgotPasswordCodeCommand>
 {
-    public SendResetPasswordCommandValidator()
+    public ChangePasswordWithForgotPasswordCodeCommandValidator()
     {
-        RuleFor(u => u.EmailConfirmCode).NotEmpty().NotNull().WithMessage("EmailConfirmCode cannot be empty!");
-        RuleFor(u => u.EmailConfirmCode).GreaterThan(6).WithMessage("EmailConfirmCode must be at least 6 characters!");
+        RuleFor(u => u.ForgotPasswordCode).NotEmpty().NotNull().WithMessage("EmailConfirmCode cannot be empty!");
+        RuleFor(u => u.ForgotPasswordCode).GreaterThan(6).WithMessage("EmailConfirmCode must be at least 6 characters!");
 
         RuleFor(u => u.UserNameOrEmail).NotEmpty().NotNull().WithMessage("UserName Or Email cannot be empty!");
         RuleFor(u => u.UserNameOrEmail).MinimumLength(6).WithMessage("UserName Or Email must be at least 6 characters!");

@@ -6,7 +6,7 @@ public class ConfirmEmailCommandValidator : AbstractValidator<ConfirmEmailComman
 {
     public ConfirmEmailCommandValidator()
     {
-        RuleFor(u => u.emailConfirmCode).NotEmpty().NotNull().WithMessage("Email verification code cannot be empty!");
-        RuleFor(u => u.emailConfirmCode).GreaterThan(6).WithMessage("Email verification code must be 6 characters!");
+        RuleFor(u => u.EmailConfirmCode).NotEmpty().NotNull().WithMessage("Email verification code cannot be empty!");
+        RuleFor(u => u.EmailConfirmCode).GreaterThan(6).WithMessage("Email verification code must be 6 characters!");
     }
 }

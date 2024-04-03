@@ -1,10 +1,10 @@
-﻿using CleanArchitecture.Application.Events;
+﻿using CleanArchitecture.Application.Events.Auth;
 using CleanArchitecture.Application.Utilities;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace CleanArchitecture.Application.Features.Auth.ForgotPasswordEmail;
 
@@ -16,31 +16,37 @@ internal sealed class ForgotPasswordEmailCommandHandler(UserManager<AppUser> use
 
         if (user is null)
         {
-            return Result<string>.Failure((int)HttpStatusCode.NotFound, "User not found!");
+            return Result<string>.Failure( "User not found!");
         }
 
         Random? random = new();
+        var isForgotPasswordCodeExists = true;
+        var forgotPasswordCode = 0;
 
-        var emailConfirmCode = random.Next(111111, 999999);
-        var isEmailConfirmCodeExists = true;
-
-        while (isEmailConfirmCodeExists)
+        while (isForgotPasswordCodeExists)
         {
-            isEmailConfirmCodeExists = await userManager.Users.AnyAsync(p => p.EmailConfirmCode == emailConfirmCode, cancellationToken);
+            forgotPasswordCode = random.Next(1111111111, 999999999);
+            isForgotPasswordCodeExists = await userManager.Users.AnyAsync(p => p.ForgotPasswordCode == forgotPasswordCode, cancellationToken);
 
-            if (isEmailConfirmCodeExists)
+            if (isForgotPasswordCodeExists)
             {
-                emailConfirmCode = random.Next(111111, 999999);
+                forgotPasswordCode = random.Next(1111111111, 999999999);
             }
         }
 
-        user.EmailConfirmed = false;
-        user.EmailConfirmCode = emailConfirmCode;
+        var minute = 5;
+
+        user.ForgotPasswordCode = forgotPasswordCode;
+        user.ForgotPasswordCodeSendDate = DateTime.Now.AddMinutes(minute);
         await userManager.UpdateAsync(user);
 
+        var subject = "Reset Your Password";
+        var body = EmailBody.CreateSendForgotPasswordCodeEmailBody(forgotPasswordCode.ToString(), minute);
 
-        await mediator.Publish(new AuthDomainEvent(user));
+        await mediator.Publish(new AuthDomainEvent(user, subject, body));
 
-        return Result<string>.Succeed("Your user password has been updated. Verification code has been sent via email.");
+        var email = EmailBody.MaskEmail(user.Email ?? "");
+
+        return Result<string>.Succeed($"Password recovery code is sent to your {email} email address");
     }
 }

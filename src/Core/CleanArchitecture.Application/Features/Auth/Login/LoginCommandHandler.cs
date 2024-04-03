@@ -5,7 +5,6 @@ using CleanArchitecture.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace CleanArchitecture.Application.Features.Auth.Login;
 
@@ -17,18 +16,18 @@ internal sealed class LoginCommandHandler(UserManager<AppUser> userManager, IJwt
 
         if (user is null)
         {
-            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.NotFound, "User not found!");
+            return Result<LoginCommandResponse>.Failure( "User not found!");
         }
 
         if (user.EmailConfirmed is false)
         {
-            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.NotFound, "This registration has not been approved, please confirm your registration!");
+            return Result<LoginCommandResponse>.Failure( "This registration has not been approved, please confirm your registration!");
         }
 
         var checkPassword = await userManager.CheckPasswordAsync(user, request.Password);
         if (!checkPassword)
         {
-            return Result<LoginCommandResponse>.Failure((int)HttpStatusCode.Unauthorized, "Wrong password!");
+            return Result<LoginCommandResponse>.Failure( "Wrong password!");
         }
 
         var token = await jwtProvider.CreateTokenAsync(user, request.RememberMe);

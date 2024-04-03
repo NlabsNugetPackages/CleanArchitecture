@@ -1,6 +1,6 @@
 @WebAPI_HostAddress = http://localhost:5283
 
-GET {{WebAPI_HostAddress}}/
+GET {{WebAPI_HostAddress}}/api/products/getall
 Accept: application/json
 
 ###

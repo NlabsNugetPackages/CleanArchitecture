@@ -2,4 +2,6 @@
 using MediatR;
 
 namespace CleanArchitecture.Application.Features.Auth.SendConfirmEmail;
-public sealed record SendConfirmEmailCommand(string UserNameOrEmail) : IRequest<Result<string>>;
+public sealed record SendConfirmEmailCommand(
+    string UserNameOrEmail
+) : IRequest<Result<string>>;

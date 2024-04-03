@@ -1,17 +1,16 @@
 ﻿using CleanArchitecture.Application.Options;
-using CleanArchitecture.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 
-namespace CleanArchitecture.Application.Events;
+namespace CleanArchitecture.Application.Events.Auth;
 
-public sealed class SendConfirmEmailDomainEvent : INotificationHandler<AuthDomainEvent>
+public sealed class SendEmailDomainEvent : INotificationHandler<AuthDomainEvent>
 {
     private readonly IConfiguration _configuration;
 
-    public SendConfirmEmailDomainEvent(IConfiguration configuration)
+    public SendEmailDomainEvent(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -19,17 +18,17 @@ public sealed class SendConfirmEmailDomainEvent : INotificationHandler<AuthDomai
     public async Task Handle(AuthDomainEvent notification, CancellationToken cancellationToken)
     {
         var emailOptions = _configuration.GetSection("Email").Get<EmailOptions>();
-        
+
         using (MailMessage mail = new MailMessage())
         {
-            var subject = "User Account Verification Process";
+            var subject = notification._subject;
             mail.From = new MailAddress(emailOptions!.Email);
             mail.To.Add(notification._user.Email ?? "");
             mail.Subject = subject;
-            mail.Body = EmailBody.CreateConfirmEmailBody(notification._user.EmailConfirmCode.ToString());
+            mail.Body = notification._body;
             mail.IsBodyHtml = true;
 
-            using (SmtpClient smtp = new SmtpClient(emailOptions.SMTP, emailOptions.PORT))
+            using (var smtp = new SmtpClient(emailOptions.SMTP, emailOptions.PORT))
             {
                 smtp.UseDefaultCredentials = false;
                 smtp.Credentials = new NetworkCredential(emailOptions.Email, emailOptions.Password);

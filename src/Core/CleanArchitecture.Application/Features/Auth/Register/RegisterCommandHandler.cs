@@ -1,44 +1,62 @@
-﻿using CleanArchitecture.Application.Events;
+﻿using AutoMapper;
+using CleanArchitecture.Application.Events.Auth;
 using CleanArchitecture.Application.Utilities;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Application.Features.Auth.Register;
-public sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMediator mediator) : IRequestHandler<RegisterCommand, Result<string>>
+public sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMapper mapper, IMediator mediator) : IRequestHandler<RegisterCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
+        if (request.Email is null)
+        {
+            return Result<string>.Failure( "Email cannot be empty!");
+        }
+
+        var isEmailExists = await userManager.Users.AnyAsync(u => u.Email == request.Email);
+        if (isEmailExists)
+        {
+            return Result<string>.Failure( "Email already has taken!");
+        }
+
+        var isUserNameExists = await userManager.Users.AnyAsync(u => u.UserName == request.UserName);
+        if (isUserNameExists)
+        {
+            return Result<string>.Failure( "User name already has taken");
+        }
+
+
+        AppUser? user = mapper.Map<AppUser>(request);
+
         Random? random = new();
-
-        int emailConfirmCode = random.Next(111111, 999999);
         var isEmailConfirmCodeExists = true;
-
         while (isEmailConfirmCodeExists)
         {
-            isEmailConfirmCodeExists = await userManager.Users.AnyAsync(p => p.EmailConfirmCode == emailConfirmCode, cancellationToken);
+            user.EmailConfirmCode = random.Next(1111111111, 999999999);
 
-            if (isEmailConfirmCodeExists)
+            if (!userManager.Users.Any(u => u.EmailConfirmCode == user.EmailConfirmCode))
             {
-                emailConfirmCode = random.Next(111111, 999999);
+                isEmailConfirmCodeExists = false;
             }
+        }
+
+        var minute = 5;
+
+        user.EmailConfirmCodeSendDate = DateTime.Now.AddMinutes(minute);
+
+        if (request.Password is null || request.RePassword is null)
+        {
+            return Result<string>.Failure( "Password OR re-password cannot be empty");
         }
 
         if (request.RePassword != request.Password)
         {
-            return Result<string>.Failure("Password and password repeat do not match.");
+            return Result<string>.Failure( "Password and password repeat do not match.");
         }
-
-        AppUser? user = new()
-        {
-            FirstName = request.FirstName.Trim(),
-            LastName = request.LastName.Trim(),
-            Email = request.Email.ToLower().Trim(),
-            UserName = request.UserName.ReplaceAllTurkishCharacters().ToLower().Trim(),
-            EmailConfirmCode = emailConfirmCode,
-            EmailConfirmCodeSendDate = DateTime.Now
-        };
 
         var result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
@@ -46,7 +64,9 @@ public sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMe
             return Result<string>.Failure("An error occurred while registering, please try again.");
         }
 
-        await mediator.Publish(new AuthDomainEvent(user));
+        string subject = "Verification Mail" ?? "";
+        var body = EmailBody.CreateSendForgotPasswordCodeEmailBody(user.EmailConfirmCode.ToString(), minute);
+        await mediator.Publish(new AuthDomainEvent(user,subject, body));
 
         return Result<string>.Succeed("User created successfully");
     }
