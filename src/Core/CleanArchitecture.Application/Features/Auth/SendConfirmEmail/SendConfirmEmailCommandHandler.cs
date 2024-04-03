@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Application.Features.Auth.SendConfirmEmail;
 
-internal sealed class SendConfirmEmailCommandHandler(UserManager<AppUser> userManager, Mediator mediator) : IRequestHandler<SendConfirmEmailCommand, Result<string>>
+internal sealed class SendConfirmEmailCommandHandler(UserManager<AppUser> userManager, IMediator mediator) : IRequestHandler<SendConfirmEmailCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(SendConfirmEmailCommand request, CancellationToken cancellationToken)
     {
