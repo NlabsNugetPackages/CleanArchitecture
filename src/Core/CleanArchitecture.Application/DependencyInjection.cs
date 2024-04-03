@@ -1,6 +1,5 @@
 ﻿using CleanArchitecture.Application.Behaviors;
 using CleanArchitecture.Application.Options;
-using CleanArchitecture.Domain.Entities;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +13,10 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
         services.AddMediatR(configuration =>
         {
-            configuration.RegisterServicesFromAssemblies(
-                typeof(DependencyInjection).Assembly,
-                typeof(AppUser).Assembly);
+            configuration.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            //configuration.RegisterServicesFromAssemblies(
+            //    typeof(DependencyInjection).Assembly,
+            //    typeof(AppUser).Assembly);
             configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
